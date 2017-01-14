@@ -1,7 +1,7 @@
 import tensorflow as tf
 import cPickle as pickle
 from collections import defaultdict
-import re
+import re, random
 
 #Read data and do preprocessing
 def read_data(fn):
@@ -9,7 +9,7 @@ def read_data(fn):
         data = pickle.load(f)
     
     #Clean the text
-    data_x, data_y = [],[]
+    new_data = []
     pattern = re.compile('[\W_]+')
     for text,label in data:
         text = text.strip("\r\n ").split()
@@ -19,14 +19,13 @@ def read_data(fn):
             word = word.lower()
             if 0 < len(word) < 30:
                 x.append(word)
-        data_x.append(x)
-        data_y.append(int(label))
-    return data_x, data_y
+        new_data.append((x,label))
+    return new_data 
 
-train_x, train_y = read_data("data/train.p")
-print train_x[0:10]
+train = read_data("data/train.p")
+print train[0:10]
 
-#build vocabulary from train_x
+#build vocabulary from train
 def build_vocab(data_x, min_count=100):
     counts = defaultdict(int)
     for x in data_x:
@@ -42,11 +41,13 @@ def build_vocab(data_x, min_count=100):
 def map_data(data_x, vocab):
     return [[vocab[w] for w in x] for x in data_x]
 
+train_x, train_y = zip(*train)
 vocab = build_vocab(train_x)
 vocab_size = len(vocab)
 print "Vocab size:", len(vocab)
 
 train_x = map_data(train_x, vocab)
+train = zip(train_x, train_y)
 
 import math
 
@@ -87,4 +88,5 @@ loss = tf.nn.sigmoid_cross_entropy_with_logits(sentiment, label)
 optimizer = tf.train.AdamOptimizer().minimize(loss / batch_size)
 
 tf.global_variables_initializer().run(session=session)
+saver = tf.train.Saver()
 
