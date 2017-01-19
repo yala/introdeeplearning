@@ -2,6 +2,8 @@ import tensorflow as tf
 import cPickle as pickle
 from collections import defaultdict
 import re, random
+import numpy as np
+from sklearn.feature_extraction.text import CountVectorizer
 
 #Read data and do preprocessing
 def read_data(fn):
@@ -17,44 +19,31 @@ def read_data(fn):
         for word in text:
             word = pattern.sub('', word)
             word = word.lower()
-            if 0 < len(word) < 30:
+            if 0 < len(word) < 20:
                 x.append(word)
-        new_data.append((x,label))
+        new_data.append((' '.join(x),label))
     return new_data 
 
 train = read_data("data/train.p")
 print train[0:10]
 
-#build vocabulary from train
-def build_vocab(data_x, min_count=100):
-    counts = defaultdict(int)
-    for x in data_x:
-        for w in x:
-            counts[w] += 1
-    vocab = defaultdict(int)
-    vocab["<unk>"] = 0
-    for w,c in counts.iteritems():
-        if c > min_count:
-            vocab[w] = len(vocab)
-    return vocab
-
-def map_data(data_x, vocab):
-    return [[vocab[w] for w in x] for x in data_x]
-
 train_x, train_y = zip(*train)
-vocab = build_vocab(train_x)
-vocab_size = len(vocab)
-print "Vocab size:", len(vocab)
+vectorizer = CountVectorizer(train_x, min_df=0.001) 
+vectorizer.fit(train_x)
+vocab = vectorizer.vocabulary_
 
-train_x = map_data(train_x, vocab)
-train = zip(train_x, train_y)
+UNK_ID = len(vocab)
+PAD_ID = len(vocab) + 1
+word2id = lambda w:vocab[w] if w in vocab else UNK_ID
+train_x = [[word2id(w) for w in x.split()] for x in train_x]
+train_data = zip(train_x, train_y)
 
 import math
 
 #build RNN model
 batch_size = 20
 hidden_size = 100
-vocab_size = len(vocab)
+vocab_size = len(vocab) + 2
 
 def lookup_table(input_, vocab_size, output_size, name):
     with tf.variable_scope(name):
@@ -73,20 +62,45 @@ def linear(input_, output_size, name, init_bias=0.0):
 
 session = tf.Session()
 
-sentence = tf.placeholder(tf.int32, [batch_size, None])
-label = tf.placeholder(tf.float32, [batch_size])
+tweets = tf.placeholder(tf.int32, [batch_size, None])
+labels = tf.placeholder(tf.float32, [batch_size])
 
-embedding = lookup_table(sentence, vocab_size, hidden_size, name="word_embedding")
+embedding = lookup_table(tweets, vocab_size, hidden_size, name="word_embedding")
 lstm_cell = tf.nn.rnn_cell.BasicLSTMCell(hidden_size)
 init_state = lstm_cell.zero_state(batch_size, tf.float32)
 _, final_state = tf.nn.dynamic_rnn(lstm_cell, embedding, initial_state=init_state)
 sentiment = linear(final_state[1], 1, name="output")
 
 sentiment = tf.squeeze(sentiment, [1])
-loss = tf.nn.sigmoid_cross_entropy_with_logits(sentiment, label)
+loss = tf.nn.sigmoid_cross_entropy_with_logits(sentiment, labels)
+loss = tf.reduce_mean(loss)
+prediction = tf.to_float(tf.greater_equal(sentiment, 0.5))
+pred_err = tf.to_float(tf.not_equal(prediction, labels))
+pred_err = tf.reduce_sum(pred_err)
 
-optimizer = tf.train.AdamOptimizer().minimize(loss / batch_size)
+optimizer = tf.train.AdamOptimizer().minimize(loss)
 
 tf.global_variables_initializer().run(session=session)
 saver = tf.train.Saver()
 
+random.shuffle(train_data)
+
+err_rate = 0.0
+for step in xrange(0, len(train_data), batch_size):
+    batch = train_data[step:step+batch_size]
+    batch_x, batch_y = zip(*batch)
+    batch_x = list(batch_x)
+    if len(batch_x) != batch_size:
+        continue
+    max_len = max([len(x) for x in batch_x])
+    for i in xrange(batch_size):
+        len_x = len(batch_x[i])
+        batch_x[i] = [PAD_ID] * (max_len - len_x) + batch_x[i]
+    batch_x = np.array(batch_x, dtype=np.int32)
+    batch_y = np.array(batch_y, dtype=np.float32)
+    feed_map = {tweets:batch_x, labels:batch_y}
+    _, batch_err = session.run([optimizer, pred_err], feed_dict=feed_map)
+    err_rate += batch_err
+    if step % 100 == 0 and step > 0:
+        print err_rate / step
+    
