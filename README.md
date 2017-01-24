@@ -24,9 +24,9 @@ git clone https://github.com/yala/introdeeplearning;
 cd introdeeplearning;
 conda create -n introdl python=2.7;
 source activate introdl;
-pip install --upgrade pip;
-pip install tensorflow;
-pip install word2vec;
-pip install jupyter;
+conda install tensorflow;
+conda install word2vec;
+conda install jupyter;
 echo 'done';
+jupyter notebook
 ```
