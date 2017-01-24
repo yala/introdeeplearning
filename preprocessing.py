@@ -16,10 +16,13 @@ vocabIndxDict = {}
 for i,v in enumerate(vocab):
     vocabIndxDict[v] = i
 
-raw_input("vocab")
+
 
 UNK_ID = vocabIndxDict["unktoken"] 
 PAD_ID = vocabIndxDict["padtoken"] 
+    
+print "unkid",UNK_ID
+print "padid",PAD_ID
 
 def tweet2id(tweet):
     resTweet = []
@@ -30,8 +33,8 @@ def tweet2id(tweet):
                 resTweet.append(vocabIndxDict[tweet[i]])
             else:
                 resTweet.append(UNK_ID)
-        else:
-            resTweet.append(PAD_ID)
+    resTweet = ([PAD_ID] * (20 - len(resTweet) )) + resTweet
+    assert len(resTweet) == 20
     return np.array(resTweet, dtype=np.int32)
 
 train_data_pre = [ (tweet2id(tweet),label) for tweet,label in trainData]
