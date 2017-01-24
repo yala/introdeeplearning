@@ -25,7 +25,7 @@ cd introdeeplearning;
 conda create -n introdl python=2.7;
 source activate introdl;
 conda install tensorflow;
-conda install word2vec;
+pip install word2vec;
 conda install jupyter;
 echo 'done';
 jupyter notebook
