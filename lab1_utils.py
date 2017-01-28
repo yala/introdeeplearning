@@ -2,7 +2,7 @@ import csv
 import pandas as pd
 import re
 import special_tokens
-import np
+import numpy as np
 import random
 import tensorflow as tf
 import matplotlib.pyplot as plt
@@ -181,7 +181,7 @@ def classify_and_plot(data, labels, x, out, session):
         # print('ec', int(decision), int(label))
         # print('ec2', decision, label)
         # print(int(decision) is int(label))
-        m_text = 'g' if int(decision) is int(label) else 'r'
+        m_text = 'g' if int(decision) == int(label) else 'r'
         m_text += '_' if label == 0 else '+'
         plt.plot(x_input[0], x_input[1], m_text, markersize=10)
         
