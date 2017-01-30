@@ -6,6 +6,10 @@ Lab 1 can be found at `6.S191-Lab1.ipynb`.
 ## Lab 2: LSTM's for Sequence Modeling
 Lab 2 can be found at `6.S191-Lab2.ipynb`.
 
+
+## Running the labs
+The labs are jupyter notebooks, so run `jupyter notebook` in this directory, and then click on the proper file name in jupyter to open it.
+
 ## Install Instructions
 Please copy the following commands to your bash terminal:
 
