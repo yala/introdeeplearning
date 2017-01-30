@@ -35,7 +35,7 @@ git clone https://github.com/yala/introdeeplearning;
 cd introdeeplearning;
 conda create -n intro_dl;
 source activate intro_dl;
-conda install tensorflow;
+conda install -c conda-forge tensorflow;
 pip install matplotlib;
 pip install pandas;
 conda install jupyter;
