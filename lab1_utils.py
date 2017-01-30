@@ -195,7 +195,7 @@ def classify_and_plot(data, labels, x, out, session):
     xx = np.arange(0, 100)/10.0
     yy = np.arange(0, 100)/10.0
 
-    mesh = np.array([[i, j] for i in range(100) for j in range(100)])/10.0
+    mesh = np.array([[j, i] for i in range(100) for j in range(100)])/10.0
 
     # here "model" is your model's prediction (classification) function
     Z = session.run([out], feed_dict={x: mesh})[0]
