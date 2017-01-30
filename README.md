@@ -19,10 +19,9 @@ If you are using pip:
 git clone https://github.com/yala/introdeeplearning;
 cd introdeeplearning;
 pip install virtualenv;
-virtualenv venv;
-source venv/bin/activate;
+virtualenv intro_dl;
+source intro_dl/bin/activate;
 pip install --upgrade pip;
-source venv/bin/activate;
 pip install tensorflow;
 pip install matplotlib;
 pip install pandas;
@@ -34,8 +33,8 @@ jupyter notebook
 ```
 git clone https://github.com/yala/introdeeplearning;
 cd introdeeplearning;
-conda create -n introdl;
-source activate introdl;
+conda create -n intro_dl;
+source activate intro_dl;
 conda install tensorflow;
 pip install matplotlib;
 pip install pandas;
