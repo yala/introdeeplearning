@@ -108,7 +108,7 @@ def get_word_counts(sentences_of_words):
 
 def split_into_words(sentence):
   """Basic word splitting"""
-  _WORD_SPLIT = re.compile(b"([.,!?\"':;)(])")
+  _WORD_SPLIT = re.compile("([.,!?\"':;)(])")
   words = []
   for space_separated_fragment in sentence.strip().split():
     words.extend(_WORD_SPLIT.split(space_separated_fragment))
