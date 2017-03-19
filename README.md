@@ -1,10 +1,10 @@
-# 6.S191 Labs
+# Intro to TensorFlow Labs
 
 ## Lab 1: Intro to Tensorflow and MLP's for Sentiment Analysis
-Lab 1 can be found at `6.S191-Lab1.ipynb`.
+Lab 1 can be found at `Lab1.ipynb`.
 
 ## Lab 2: LSTM's for Sequence Modeling
-Lab 2 can be found at `6.S191-Lab2.ipynb`.
+Lab 2 can be found at `Lab2.ipynb`.
 
 
 ## Running the labs
