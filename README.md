@@ -26,9 +26,12 @@ pip install tensorflow;
 pip install matplotlib;
 pip install pandas;
 pip install jupyter;
+python -m ipykernel install --user --name=intro_dl
 echo 'done';
 jupyter notebook
 ```
+From within jupyter, in the top-right corner, select the kernel named "intro_dl". This is the kernel that will have the contents of your virtualenv.
+
 ## Conda Instructions
 ```
 git clone https://github.com/yala/introdeeplearning;
